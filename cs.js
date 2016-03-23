@@ -16,7 +16,7 @@ var API;
 
 exports.processSteamIds = function(steamContents, sentAPI, callback) {
   API=sentAPI;
-	var steamID, friends, playerInfo, friendGroups;
+  var steamID, friends, playerInfo, friendGroups;
 
   steamIDs = steamContents.trim().replace(/\\(.)/mg, "$1");
 
