@@ -1,0 +1,23 @@
+{
+  "name": "csgo-player-stats",
+  "version": "1.0.1",
+  "description": "An application that gathers player statistics and ban information from Counter-Strike Global Offensive using the Steam API",
+  "main": "cs.js",
+  "dependencies": {
+    "mathjs": "^3.0.0",
+    "request": "^2.69.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "csgo",
+    "player",
+    "statistics",
+    "ban",
+    "information"
+  ],
+  "author": "Joacim Andersson",
+  "license": "ISC"
+}
