@@ -216,44 +216,15 @@ function colorAcc(acc) {
 }
 
 function getInformationFromAPI(sIds, callback) {
-  var rows = sIds.split("\n");
-  var players = [];
-  var nodesFriends = [];
-  var nodesGameStats = [];
-  var nodesBanStats = [];
+  var allPlayersInfo = sIds.split("\n");
 
-  // Collect all the URLs
-  for (var i = 0; i < rows.length; i++) {
-    steamId = rows[i];
-    steamId = steamId.replace("  ", " ");
-    steamId = steamId.replace("   ", " ");
+  var URLResults = collectURLs(allPlayersInfo);
 
-    // Check if the SteamId is valid
-    if (steamId.charAt(0) === '#' && steamId.charAt(1) === " " &&  
-      (isNum(steamId.charAt(2)) || isNum(steamId.charAt(3)))) {
+  var players = URLResults.players;
+  var nodesFriends = URLResults.nodesFriends;
+  var nodesGameStats = URLResults.nodesGameStats;
 
-      nick = [].concat.apply([], steamId.split('"').map(function(v,i){
-         return i%2 ? v : v.split(' ')
-      })).filter(Boolean);
-
-      var p = new Player(nick[3], nick[4], toCommunityId(nick[4]));
-
-      players.push(p);
-      nodesFriends.push('http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key='+API+'&steamid='+p.getCommunityid()+'&relationship=friend');
-      nodesGameStats.push('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key='+API+'&steamid='+p.getCommunityid());
-      nodesBanStats.push(""+p.getCommunityid());
-    }
-  }
-
-  var sIds = "";
-  for (var i = 0; i < nodesBanStats.length; i++) {
-    sIds += (","+nodesBanStats[i]);
-  }
-
-  // Borrow the friendNodes list to push banlist
-  nodesFriends.push('http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key='+API+'&steamids='+sIds);
-
-  // Request all URLs 
+  // Request all the URLs 
   var URLRequests = nodesFriends.concat(nodesGameStats);
   __request(URLRequests, function(responses) {
     for (var i = 0; i < nodesFriends.length-1; i++) {
@@ -270,6 +241,44 @@ function getInformationFromAPI(sIds, callback) {
 
     callback(players, banResults);
   });
+}
+
+function collectURLs(allPlayersInfo) {
+  var players = [], nodesFriends = [], nodesGameStats = [], nodesBanStats = [], banIDs = "";
+
+  for (var i = 0; i < allPlayersInfo.length; i++) {
+    playerInfo = allPlayersInfo[i].replace("  ", " ").replace("   ", " ");
+
+    if (validPlayerInfo(playerInfo)) {
+      infoArray = splitInfoToArr(playerInfo);
+
+      var p = new Player(infoArray[3], infoArray[4], toCommunityId(infoArray[4]));
+
+      players.push(p);
+      nodesFriends.push('http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key='+API+'&steamid='+p.getCommunityid()+'&relationship=friend');
+      nodesGameStats.push('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key='+API+'&steamid='+p.getCommunityid());
+      banIDs += (","+p.getCommunityid());
+    }
+  }
+  nodesFriends.push('http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key='+API+'&steamids='+banIDs);
+
+  return {
+    players: players,
+    nodesFriends : nodesFriends,
+    nodesGameStats : nodesGameStats
+  }
+}
+
+function validPlayerInfo(pInfo) {
+  return pInfo.charAt(0) === '#' && pInfo.charAt(1) === " " &&  
+      (isNum(pInfo.charAt(2)) || isNum(pInfo.charAt(3)));
+}
+
+function splitInfoToArr(info) {
+  arr = [].concat.apply([], info.split('"').map(function(v,i){
+         return i%2 ? v : v.split(' ')
+      })).filter(Boolean);
+  return arr;
 }
 
 // Convert a 32-bit steamID to a 64-bit steamID, using the mathjs library
