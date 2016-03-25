@@ -13,21 +13,43 @@ math.config({
 });
 
 var API;
+var logInput = false;
 
-exports.processSteamIds = function(steamContents, sentAPI, callback) {
-  API=sentAPI;
+exports.setup = function(options) {
+  API = options.API;
+  logInput = options.logInput;
+}
+
+exports.processSteamIds = function(steamContents, callback) {
+  if (!validInput(steamContents)) {
+    callback([],[]);
+    return;
+  }
+
   var steamID, friends, playerInfo, friendGroups;
 
   steamIDs = steamContents.trim().replace(/\\(.)/mg, "$1");
 
-  fs.appendFile('./recent.txt', steamIDs, function (err) {
-    if (err)
-      console.log("Error when writing to file - " + err);
-  });
+  if (logInput) {
+    fs.appendFile('./csgo-player-stats-inputs.txt', steamIDs, function (err) {
+      if (err)
+        console.log("Error when writing to file - " + err);
+    });
+  }
 
   getInformationFromAPI(steamIDs, function(ps, bs) {
     processData(ps, bs, callback);
   });
+}
+
+function validInput(input) {
+  if (API === "") {
+    console.log("Error: API key is not set up");
+    return false;
+  }
+  if (input.length < 20)
+    return false;
+  return true;
 }
 
 function processData(ps, bs, callback) {
