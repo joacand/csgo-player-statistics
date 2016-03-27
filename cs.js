@@ -349,16 +349,20 @@ function isNum(n) {
  * @param callback [function]
  * @requires request module for node ( https://github.com/mikeal/request )
  *
- * From: https://gist.github.com/natos
- * Source: https://gist.github.com/natos/2001487
+ * Modified from: https://gist.github.com/natos/2001487
  */
 var __request = function (urls, callback) {
   'use strict';
-  var results = {}, t = urls.length, c = 0,
-    handler = function (error, response, body) {
-      var url = response.request.uri.href;
-      results[url] = { error: error, response: response, body: body };
-      if (++c === urls.length) { callback(results); }
-    };
-  while (t--) { request(urls[t], handler); }
+  var results = {}, c = 0;
+  var handler = function (error, response, body) {
+    var url = response.request.uri.href;
+    results[url] = { error: error, response: response, body: body };
+    if (++c === urls.length) { 
+      callback(results); 
+    }
+  };
+
+  for (var i = 0; i < urls.length; i++) {
+    request(urls[i], handler);
+  }
 };
