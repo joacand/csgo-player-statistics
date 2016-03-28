@@ -60,26 +60,28 @@ function processData(ps, bs, callback) {
 }
 
 function getPlayerStats(ps) {
-  var playerStats=[];
+  var players=[];
 
   for (var i = 0; i < ps.length; i++) {
-    playerStats.push([]);
-
     pl = ps[i];
     pFriends = getFriends(pl.getFriendResults(), ps, pl.getNick());
     premadeSize = pFriends.length+1;
     stats = getStats(pl.getGameResults());
 
-    playerStats[i].push(pl.getNick());
-    playerStats[i].push(stats[0]);
-    playerStats[i].push(stats[1]);
-    playerStats[i].push(stats[2]);
-    playerStats[i].push(genFriendOutput(pFriends));
-    playerStats[i].push(premadeSize);
-  }
-  playerStats.sort(sortFunction);
+    var player = {
+      nick : pl.getNick(),
+      timePlayed : stats[0],
+      kdRatio : stats[1],
+      accuracy : stats[2],
+      friendsWith : genFriendOutput(pFriends),
+      premadeSize : premadeSize
+    }
 
-  return playerStats;
+    players.push(player);
+  }
+  players.sort(sortPlayerStats);
+
+  return players;
 }
 
 function getFriends(fList, ps, me) {
@@ -159,36 +161,49 @@ function genFriendOutput(pF) {
 }
 
 function getBanStats(bs, ps) {
-  var banStats = [];
+  var playersBanStats = [];
   var banListPlayers = $.parseJSON(bs).players;
 
   for (var i = 0; i < banListPlayers.length; i++) {
     pb = banListPlayers[i];
-    banStats.push([]);
-    banStats[i].push(communityIdToNick(ps, pb.SteamId));
+
+    var playerBanInfo = {
+      communityId : communityIdToNick(ps, pb.SteamId),
+      isCommunityBanned : "",
+      isVACBanned : "",
+      numberOfVACBans : pb.NumberOfVACBans,
+      daysSinceLastBan : pb.DaysSinceLastBan,
+      numberOfGameBans : pb.NumberOfGameBans
+    }
 
     if (pb.CommunityBanned === false)
-      banStats[i].push("<FONT COLOR=\"GREEN\"><b>No</b></FONT>");
+      playerBanInfo.isCommunityBanned = "<FONT COLOR=\"GREEN\"><b>No</b></FONT>";
     else
-      banStats[i].push("<FONT COLOR=\"RED\"><b>Yes</b></FONT>");
+      playerBanInfo.isCommunityBanned = "<FONT COLOR=\"RED\"><b>Yes</b></FONT>";
 
     if (pb.VACBanned === false) 
-      banStats[i].push("<FONT COLOR=\"GREEN\"><b>No</b></FONT>");
+      playerBanInfo.isVACBanned = "<FONT COLOR=\"GREEN\"><b>No</b></FONT>";
     else
-      banStats[i].push("<FONT COLOR=\"RED\"><b>Yes</b></FONT>");
+      playerBanInfo.isVACBanned = "<FONT COLOR=\"RED\"><b>Yes</b></FONT>";
 
-    banStats[i].push(pb.NumberOfVACBans);
-    banStats[i].push(pb.DaysSinceLastBan);
-    banStats[i].push(pb.NumberOfGameBans); 
+    playersBanStats.push(playerBanInfo);
   }
-  banStats.sort(sortFunction);
+  playersBanStats.sort(sortBanStats);
 
-  return banStats;
+  return playersBanStats;
 }
 
-function sortFunction(a, b) {
-  aComp = a[0].toLowerCase();
-  bComp = b[0].toLowerCase();
+function sortBanStats(a, b) {
+  aComp = a.communityId.toLowerCase();
+  bComp = b.communityId.toLowerCase();
+  if (aComp === bComp) 
+    return 0;
+  return (aComp < bComp) ? -1 : 1;
+}
+
+function sortPlayerStats(a, b) {
+  aComp = a.nick.toLowerCase();
+  bComp = b.nick.toLowerCase();
   if (aComp === bComp) 
     return 0;
   return (aComp < bComp) ? -1 : 1;
