@@ -1,0 +1,33 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='css/styles.css')
+    link(href='http://fonts.googleapis.com/css?family=Open+Sans:300', rel='stylesheet')
+    title= title
+  body
+    header.
+      Friend and Ban Checker
+    p.
+      Type 'status' in console and paste the output:
+    form(name="status", method="post", action="/")
+      textarea(name="steamid", id="steamid", rows="4", cols="100", maxlength="1000")
+      input(type="submit", name="submit", value="Submit")
+    block results
+    p.
+      Example input:<br>
+      # userid name uniqueid connected ping loss state rate<br>
+      # 11 10 "KexX" STEAM_1:1:30148034 01:35 53 0 active 80000<br>
+      # 12 11 "Puistokemisti™" STEAM_1:0:10277742 01:34 65 0 active 80000<br>
+      #  8 4 "Gh0st" STEAM_1:0:84751230 00:47 115 0 active 80000<br>
+      #  9 5 "MulleMullemuuu" STEAM_1:0:18880125 00:47 86 0 active 80000<br>
+      # 10 6 "NeX" STEAM_1:1:7996943 00:47 94 0 active 80000<br>
+      # 11 7 "Tactical René" STEAM_1:0:32504132 00:47 80 0 active 128000<br>
+      # 12 8 "i aren't think so" STEAM_1:1:9705998 00:47 78 0 active 80000<br>
+      # 13 9 "Bordinis Drambliukas" STEAM_1:1:110574096 00:47 48 0 active 30000<br>
+      #  9 7 "Fast1k?!" STEAM_1:0:24212360 31:07 71 0 active 104000<br>
+      # 15 11 "M@KTR@XeR" STEAM_1:0:117847479 00:46 34 0 active 128000<br>
+      #end
+    footer
+      p. 
+        &copy; 2016 &middot; #[a(href="http://steampowered.com") Powered by Steam]

@@ -1,0 +1,47 @@
+extends ./cs.jade
+
+block results
+  #wrap
+    #friends
+      h3 Player info:
+      table.tg
+        tr
+          th.tg-fo82 Player
+          th.tg-fo82 Time (h)
+          th.tg-fo82 K/D
+          th.tg-fo82 Acc
+          th.tg-fo82 Friends with
+          th.tg-fo82 Premade Size
+        each ps in playerStats
+          tr
+            td.tg-088f!= ps.nick
+            td.tg-088f!= ps.timePlayed
+            td.tg-088f!= ps.kdRatio
+            td.tg-088f!= ps.accuracy
+            td.tg-088f!= ps.friendsWith
+            td.tg-088f!= ps.premadeSize
+    #vac
+      h3 VAC and Community Bans:
+      table.tg
+        tr
+          th.tg-fo82 Player
+          th.tg-fo82 Community Ban
+          th.tg-fo82 VAC Ban
+          th.tg-fo82 # VAC Bans
+          th.tg-fo82 Days Since VAC
+          th.tg-fo82 # Game Bans
+        each bs in banStats
+          tr
+            td.tg-088f!= bs.nick
+            td.tg-088f!= bs.isCommunityBanned
+            td.tg-088f!= bs.isVACBanned
+            td.tg-088f!= bs.numberOfVACBans
+            td.tg-088f!= bs.daysSinceLastBan
+            td.tg-088f!= bs.numberOfGameBans           
+  #info
+    h2 Information:
+    p.
+      The accuracy is calculated from the AK47 and M4A1 to avoid weapons like the AWP skewing the statistics.
+    p.
+      The game time is time spent on actual servers, not including the main menu times. Therefore it's lower than the time reported on steam community.
+ 

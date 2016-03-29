@@ -1,0 +1,96 @@
+* {
+  font-family: 'Open Sans', sans-serif;
+}
+
+body {
+  background-color:#FFFFFF ;
+	margin-top: 20px;
+	margin-right: 20px;
+	margin-bottom: 10px;
+	margin-left: 20px;
+}
+  
+header {
+  background-color:#FFFFFF ;
+  text-align:left;
+  font-size:25px;
+  color:#BLACK ;
+  padding:1px;
+}
+
+footer {
+  font-size:15px;
+}
+
+#wrap {
+  width:100%;
+  overflow:auto;
+}
+
+#friends {
+  float:left;
+  margin-right:30px;
+}
+
+#vac {
+  float:left;
+}
+
+.tg {
+  border-collapse:collapse;
+  border-style:solid;
+  border-width:1px;
+  border-spacing:0;
+  border-color:#ccc;
+}
+
+.tg td{
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  padding:10px 5px;
+  overflow:hidden;
+  word-break:normal;
+  border-color:#ccc;
+  color:#333;
+  nth-child(even) {background: #CCC};
+  nth-child(odd) {background: #FFF};
+}
+
+.tg th{
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  font-weight:normal;
+  padding:10px 5px;
+  border-style:solid;
+  border-width:1px;
+  overflow:hidden;
+  word-break:normal;
+  border-color:#ccc;
+  color:#333;
+  background-color:#f0f0f0;
+}
+
+.tg .tg-fo82{
+  font-style:italic;
+  font-size:15px;
+  font-family:Verdana, Geneva, sans-serif !important;
+}
+
+.th .tg-088f{
+  background-color:#ffffff;
+  font-size:15px;
+  font-family:Verdana, Geneva, sans-serif !important;
+}
+
+tr:nth-child(even) {
+  background: #f6f6f6
+}
+
+tr:nth-child(odd) {
+  background: #FFF
+}
+
+td {
+  height:19px; 
+  min-width: 40px; 
+}

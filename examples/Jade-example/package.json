@@ -1,0 +1,15 @@
+{
+  "name": "jade-example",
+  "version": "1.0.0",
+  "description": "A jade example of the usage of the csgo-player-stats application",
+  "main": "jade-example.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joacim Andersson",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.4",
+    "jade": "^1.11.0"
+  }
+}
