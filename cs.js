@@ -21,7 +21,7 @@ exports.setup = function(options) {
 }
 
 exports.processSteamIds = function(steamContents, callback) {
-  if (!validInput(steamContents)) {
+  if (!isValidInput(steamContents)) {
     callback([],[]);
     return;
   }
@@ -42,7 +42,7 @@ exports.processSteamIds = function(steamContents, callback) {
   });
 }
 
-function validInput(input) {
+function isValidInput(input) {
   if (API === "") {
     console.log("Error: API key is not set up");
     return false;
@@ -79,7 +79,7 @@ function getPlayerStats(ps) {
 
     players.push(player);
   }
-  players.sort(sortPlayerStats);
+  players.sort(sortFunction);
 
   return players;
 }
@@ -168,7 +168,7 @@ function getBanStats(bs, ps) {
     pb = banListPlayers[i];
 
     var playerBanInfo = {
-      communityId : communityIdToNick(ps, pb.SteamId),
+      nick : communityIdToNick(ps, pb.SteamId),
       isCommunityBanned : "",
       isVACBanned : "",
       numberOfVACBans : pb.NumberOfVACBans,
@@ -188,20 +188,12 @@ function getBanStats(bs, ps) {
 
     playersBanStats.push(playerBanInfo);
   }
-  playersBanStats.sort(sortBanStats);
+  playersBanStats.sort(sortFunction);
 
   return playersBanStats;
 }
 
-function sortBanStats(a, b) {
-  aComp = a.communityId.toLowerCase();
-  bComp = b.communityId.toLowerCase();
-  if (aComp === bComp) 
-    return 0;
-  return (aComp < bComp) ? -1 : 1;
-}
-
-function sortPlayerStats(a, b) {
+function sortFunction(a, b) {
   aComp = a.nick.toLowerCase();
   bComp = b.nick.toLowerCase();
   if (aComp === bComp) 
@@ -286,10 +278,10 @@ function collectURLs(allPlayersInfo) {
   for (var i = 0; i < allPlayersInfo.length; i++) {
     playerInfo = allPlayersInfo[i].replace("  ", " ").replace("   ", " ");
 
-    if (validPlayerInfo(playerInfo)) {
+    if (isValidPlayerInfo(playerInfo)) {
       infoArray = splitInfoToArr(playerInfo);
 
-      var p = new Player(infoArray[3], infoArray[4], toCommunityId(infoArray[4]));
+      var p = new Player(infoArray[3], infoArray[4], steamToCommunityId(infoArray[4]));
 
       players.push(p);
       nodesFriends.push('http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key='+API+'&steamid='+p.getCommunityid()+'&relationship=friend');
@@ -306,7 +298,7 @@ function collectURLs(allPlayersInfo) {
   }
 }
 
-function validPlayerInfo(pInfo) {
+function isValidPlayerInfo(pInfo) {
   return pInfo.charAt(0) === '#' && pInfo.charAt(1) === " " &&  
       (isNum(pInfo.charAt(2)) || isNum(pInfo.charAt(3)));
 }
@@ -319,7 +311,7 @@ function splitInfoToArr(info) {
 }
 
 // Convert a 32-bit steamID to a 64-bit steamID, using the mathjs library
-function toCommunityId(steamid) {
+function steamToCommunityId(steamid) {
   var parts = steamid.split(":");
   return math.eval("("+parts[2]+"*2)+76561197960265728+"+parts[1]);
 }
