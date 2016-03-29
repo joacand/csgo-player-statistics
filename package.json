@@ -3,6 +3,10 @@
   "version": "1.0.2",
   "description": "An application that gathers player statistics and ban information from Counter-Strike Global Offensive using the Steam API",
   "main": "cs.js",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/joacand/csgo-player-statistics.git"
+  },
   "dependencies": {
     "mathjs": "^3.0.0",
     "request": "^2.69.0"
