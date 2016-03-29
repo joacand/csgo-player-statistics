@@ -34,3 +34,8 @@ cs.processSteamIds(variableWithSteamContents, function(playerStats, banStats) {
       res.render('csresults', { playerStats: playerStats, banStats: banStats });
     });
 ```
+
+## Screenshot
+
+Here is an example of how it can look like. This setup is provided in examples/Jade-example.
+![alt tag](http://i.imgur.com/fhTFK0v.png "Example usage of the application")
