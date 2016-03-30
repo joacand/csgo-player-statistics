@@ -37,8 +37,8 @@ exports.processSteamIds = function(steamContents, callback) {
     });
   }
 
-  getInformationFromAPI(steamIDs, function(ps, bs) {
-    processData(ps, bs, callback);
+  getInformationFromAPI(steamIDs, function(players, banData) {
+    processData(players, banData, callback);
   });
 }
 
@@ -52,24 +52,24 @@ function isValidInput(input) {
   return true;
 }
 
-function processData(ps, bs, callback) {
-  var playerStats = getPlayerStats(ps);
-  var banStats = getBanStats(bs, ps);
+function processData(players, banData, callback) {
+  var playerStats = getPlayerStats(players);
+  var banStats = getBanStats(banData, players);
 
   callback(playerStats, banStats);
 }
 
-function getPlayerStats(ps) {
-  var players=[];
+function getPlayerStats(players) {
+  var playerStats=[];
 
-  for (var i = 0; i < ps.length; i++) {
-    pl = ps[i];
-    pFriends = getFriends(pl.getFriendResults(), ps, pl.getNick());
-    premadeSize = pFriends.length+1;
-    stats = getStats(pl.getGameResults());
+  for (var i = 0; i < players.length; i++) {
+    var player = players[i];
+    var pFriends = getFriends(player, players);
+    var premadeSize = pFriends.length+1;
+    var stats = getStats(player.getGameResults());
 
-    var player = {
-      nick : pl.getNick(),
+    var playerData = {
+      nick : player.getNick(),
       timePlayed : stats[0],
       kdRatio : stats[1],
       accuracy : stats[2],
@@ -77,25 +77,29 @@ function getPlayerStats(ps) {
       premadeSize : premadeSize
     }
 
-    players.push(player);
+    playerStats.push(playerData);
   }
-  players.sort(sortFunction);
+  playerStats.sort(sortFunction);
 
-  return players;
+  return playerStats;
 }
 
-function getFriends(fList, ps, me) {
-  if (fList === undefined)
-    return [];
-  res=[];
-  for (var i = 0; i < ps.length; i++) {
-    p=ps[i];
-    if ((fList.indexOf((""+p.getCommunityid())) !== -1) && p.getNick() !== me) {
-      res.push(p.getNick());
+function getFriends(player, players) {
+  var friendList = player.getFriendResults();
+  var nick = player.getNick();
+  var result = []
+
+  if (friendList === undefined)
+    return result;
+
+  for (var i = 0; i < players.length; i++) {
+    var otherPlayer = players[i];
+    if ((friendList.indexOf((""+otherPlayer.getCommunityid())) !== -1) && otherPlayer.getNick() !== nick) {
+      result.push(otherPlayer.getNick());
     }
   }
 
-  return res;
+  return result;
 }
 
 function getStats(playerStats) {
@@ -160,28 +164,28 @@ function genFriendOutput(pF) {
   return output.slice(0, -2);
 }
 
-function getBanStats(bs, ps) {
+function getBanStats(banData, players) {
   var playersBanStats = [];
-  var banListPlayers = $.parseJSON(bs).players;
+  var banListPlayers = $.parseJSON(banData).players;
 
   for (var i = 0; i < banListPlayers.length; i++) {
-    pb = banListPlayers[i];
+    var player = banListPlayers[i];
 
     var playerBanInfo = {
-      nick : communityIdToNick(ps, pb.SteamId),
+      nick : communityIdToNick(players, player.SteamId),
       isCommunityBanned : "",
       isVACBanned : "",
-      numberOfVACBans : pb.NumberOfVACBans,
-      daysSinceLastBan : pb.DaysSinceLastBan,
-      numberOfGameBans : pb.NumberOfGameBans
+      numberOfVACBans : player.NumberOfVACBans,
+      daysSinceLastBan : player.DaysSinceLastBan,
+      numberOfGameBans : player.NumberOfGameBans
     }
 
-    if (pb.CommunityBanned === false)
+    if (player.CommunityBanned === false)
       playerBanInfo.isCommunityBanned = "<FONT COLOR=\"GREEN\"><b>No</b></FONT>";
     else
       playerBanInfo.isCommunityBanned = "<FONT COLOR=\"RED\"><b>Yes</b></FONT>";
 
-    if (pb.VACBanned === false) 
+    if (player.VACBanned === false)
       playerBanInfo.isVACBanned = "<FONT COLOR=\"GREEN\"><b>No</b></FONT>";
     else
       playerBanInfo.isVACBanned = "<FONT COLOR=\"RED\"><b>Yes</b></FONT>";
@@ -194,18 +198,18 @@ function getBanStats(bs, ps) {
 }
 
 function sortFunction(a, b) {
-  aComp = a.nick.toLowerCase();
-  bComp = b.nick.toLowerCase();
+  var aComp = a.nick.toLowerCase();
+  var bComp = b.nick.toLowerCase();
   if (aComp === bComp) 
     return 0;
   return (aComp < bComp) ? -1 : 1;
 }
 
-function communityIdToNick(ps, cid) {
-  for (var i = 0; i < ps.length; i++) {
-    p = ps[i];
-    if ((""+p.getCommunityid()) === cid) {
-      return p.getNick();
+function communityIdToNick(players, communityId) {
+  for (var i = 0; i < players.length; i++) {
+    var player = players[i];
+    if ((""+player.getCommunityid()) === communityId) {
+      return player.getNick();
     }
   }
   return "Unknown";
@@ -244,11 +248,10 @@ function colorAcc(acc) {
   return acc+"%";
 }
 
-function getInformationFromAPI(sIds, callback) {
-  var allPlayersInfo = sIds.split("\n");
+function getInformationFromAPI(steamIds, callback) {
+  var allPlayersInfo = steamIds.split("\n");
 
   var URLResults = collectURLs(allPlayersInfo);
-
   var players = URLResults.players;
   var nodesFriends = URLResults.nodesFriends;
   var nodesGameStats = URLResults.nodesGameStats;
@@ -257,13 +260,13 @@ function getInformationFromAPI(sIds, callback) {
   var URLRequests = nodesFriends.concat(nodesGameStats);
   __request(URLRequests, function(responses) {
     for (var i = 0; i < nodesFriends.length-1; i++) {
-      var resp = responses[nodesFriends[i]].body;
-      players[i].setFriendResults(resp);
+      var response = responses[nodesFriends[i]].body;
+      players[i].setFriendResults(response);
     }
 
     for (var i = 0; i < nodesGameStats.length; i++) {
-      var resp = responses[nodesGameStats[i]].body;
-      players[i].setGameResults(resp);
+      var response = responses[nodesGameStats[i]].body;
+      players[i].setGameResults(response);
     }
 
     var banResults = responses[nodesFriends[nodesFriends.length-1]].body;
@@ -276,17 +279,17 @@ function collectURLs(allPlayersInfo) {
   var players = [], nodesFriends = [], nodesGameStats = [], nodesBanStats = [], banIDs = "";
 
   for (var i = 0; i < allPlayersInfo.length; i++) {
-    playerInfo = allPlayersInfo[i].replace("  ", " ").replace("   ", " ");
+    var playerInfo = allPlayersInfo[i].replace("  ", " ").replace("   ", " ");
 
     if (isValidPlayerInfo(playerInfo)) {
       infoArray = splitInfoToArr(playerInfo);
 
-      var p = new Player(infoArray[3], infoArray[4], steamToCommunityId(infoArray[4]));
+      var player = new Player(infoArray[3], infoArray[4], steamToCommunityId(infoArray[4]));
 
-      players.push(p);
-      nodesFriends.push('http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key='+API+'&steamid='+p.getCommunityid()+'&relationship=friend');
-      nodesGameStats.push('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key='+API+'&steamid='+p.getCommunityid());
-      banIDs += (","+p.getCommunityid());
+      players.push(player);
+      nodesFriends.push('http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key='+API+'&steamid='+player.getCommunityid()+'&relationship=friend');
+      nodesGameStats.push('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key='+API+'&steamid='+player.getCommunityid());
+      banIDs += (","+player.getCommunityid());
     }
   }
   nodesFriends.push('http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key='+API+'&steamids='+banIDs);
@@ -304,22 +307,22 @@ function isValidPlayerInfo(pInfo) {
 }
 
 function splitInfoToArr(info) {
-  arr = [].concat.apply([], info.split('"').map(function(v,i){
+  var arr = [].concat.apply([], info.split('"').map(function(v,i){
          return i%2 ? v : v.split(' ')
       })).filter(Boolean);
   return arr;
 }
 
 // Convert a 32-bit steamID to a 64-bit steamID, using the mathjs library
-function steamToCommunityId(steamid) {
-  var parts = steamid.split(":");
+function steamToCommunityId(steamId) {
+  var parts = steamId.split(":");
   return math.eval("("+parts[2]+"*2)+76561197960265728+"+parts[1]);
 }
 
 // "Class" representing a player
-function Player (nick, steamid, communityid) {
+function Player (nick, steamId, communityid) {
   this.nick=nick;
-  this.steamid=steamid;
+  this.steamId=steamId;
   this.communityid=communityid;
   this.friendResults;
   this.gameResults;
@@ -327,7 +330,7 @@ function Player (nick, steamid, communityid) {
     return this.nick;
   };
   this.getSteamid = function() {
-    return this.steamid;
+    return this.steamId;
   };
   this.getCommunityid = function() {
     return this.communityid;
