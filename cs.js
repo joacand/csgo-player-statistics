@@ -18,7 +18,7 @@ var logInput = false;
 exports.setup = function(options) {
   API = options.API;
   logInput = options.logInput;
-}
+};
 
 exports.processSteamIds = function(steamContents, callback) {
   if (!isValidInput(steamContents)) {
@@ -40,7 +40,7 @@ exports.processSteamIds = function(steamContents, callback) {
   getInformationFromAPI(steamIDs, function(players, banData) {
     processData(players, banData, callback);
   });
-}
+};
 
 function isValidInput(input) {
   if (API === "") {
@@ -60,7 +60,7 @@ function processData(players, banData, callback) {
 }
 
 function getPlayerStats(players) {
-  var playerStats=[];
+  var playerStats = [];
 
   for (var i = 0; i < players.length; i++) {
     var player = players[i];
@@ -75,7 +75,7 @@ function getPlayerStats(players) {
       accuracy : stats[2],
       friendsWith : genFriendOutput(pFriends),
       premadeSize : premadeSize
-    }
+    };
 
     playerStats.push(playerData);
   }
@@ -87,7 +87,7 @@ function getPlayerStats(players) {
 function getFriends(player, players) {
   var friendList = player.getFriendResults();
   var nick = player.getNick();
-  var result = []
+  var result = [];
 
   if (friendList === undefined)
     return result;
@@ -178,7 +178,7 @@ function getBanStats(banData, players) {
       numberOfVACBans : player.NumberOfVACBans,
       daysSinceLastBan : player.DaysSinceLastBan,
       numberOfGameBans : player.NumberOfGameBans
-    }
+    };
 
     if (player.CommunityBanned === false)
       playerBanInfo.isCommunityBanned = "<FONT COLOR=\"GREEN\"><b>No</b></FONT>";
@@ -259,13 +259,14 @@ function getInformationFromAPI(steamIds, callback) {
   // Request all the URLs 
   var URLRequests = nodesFriends.concat(nodesGameStats);
   __request(URLRequests, function(responses) {
-    for (var i = 0; i < nodesFriends.length-1; i++) {
-      var response = responses[nodesFriends[i]].body;
+    var i, response;
+    for (i = 0; i < nodesFriends.length-1; i++) {
+      response = responses[nodesFriends[i]].body;
       players[i].setFriendResults(response);
     }
 
-    for (var i = 0; i < nodesGameStats.length; i++) {
-      var response = responses[nodesGameStats[i]].body;
+    for (i = 0; i < nodesGameStats.length; i++) {
+      response = responses[nodesGameStats[i]].body;
       players[i].setGameResults(response);
     }
 
@@ -298,7 +299,7 @@ function collectURLs(allPlayersInfo) {
     players: players,
     nodesFriends : nodesFriends,
     nodesGameStats : nodesGameStats
-  }
+  };
 }
 
 function isValidPlayerInfo(pInfo) {
@@ -308,7 +309,7 @@ function isValidPlayerInfo(pInfo) {
 
 function splitInfoToArr(info) {
   var arr = [].concat.apply([], info.split('"').map(function(v,i){
-         return i%2 ? v : v.split(' ')
+         return i%2 ? v : v.split(' ');
       })).filter(Boolean);
   return arr;
 }
@@ -321,11 +322,11 @@ function steamToCommunityId(steamId) {
 
 // "Class" representing a player
 function Player (nick, steamId, communityid) {
-  this.nick=nick;
-  this.steamId=steamId;
-  this.communityid=communityid;
-  this.friendResults;
-  this.gameResults;
+  this.nick = nick;
+  this.steamId = steamId;
+  this.communityid = communityid;
+  this.friendResults = "";
+  this.gameResults = [];
   this.getNick = function() {
     return this.nick;
   };
@@ -336,10 +337,10 @@ function Player (nick, steamId, communityid) {
     return this.communityid;
   };
   this.setFriendResults = function(res) {
-    this.friendResults=res;
+    this.friendResults = res;
   };
   this.setGameResults = function(res) {
-    this.gameResults=res;
+    this.gameResults = res;
   };
   this.getFriendResults = function() {
     return this.friendResults;
