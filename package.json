@@ -8,6 +8,8 @@
     "url": "https://github.com/joacand/csgo-player-statistics.git"
   },
   "dependencies": {
+    "jquery": "^2.2.2",
+    "jsdom": "^8.2.0",
     "mathjs": "^3.0.0",
     "request": "^2.69.0"
   },
