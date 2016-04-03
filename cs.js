@@ -12,7 +12,7 @@ math.config({
   precision: 20
 });
 
-var API;
+var API = "";
 var logInput = false;
 
 exports.setup = setup;
