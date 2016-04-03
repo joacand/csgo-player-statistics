@@ -12,10 +12,11 @@
     "request": "^2.69.0"
   },
   "devDependencies": {
+    "mocha": "*",
     "jshint": "^2.9.1"
   },
   "scripts": {
-    "test": "jshint cs.js"
+    "test": "mocha && jshint cs.js"
   },
   "keywords": [
     "csgo",
