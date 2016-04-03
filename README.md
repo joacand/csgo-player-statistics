@@ -1,4 +1,5 @@
-# CS:GO Player Statistics and Ban Information [![Build Status](https://travis-ci.org/joacand/csgo-player-statistics.svg?branch=master)](https://travis-ci.org/joacand/csgo-player-statistics)
+# CS:GO Player Statistics and Ban Information
+[![Build Status](https://travis-ci.org/joacand/csgo-player-statistics.svg?branch=master)](https://travis-ci.org/joacand/csgo-player-statistics)
 
 An application that gathers player statistics and ban information from Counter-Strike Global Offensive using the Steam API.
 

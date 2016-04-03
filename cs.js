@@ -15,12 +15,15 @@ math.config({
 var API;
 var logInput = false;
 
-exports.setup = function(options) {
+exports.setup = setup;
+exports.processSteamIds = processSteamIds;
+
+function setup(options) {
   API = options.API;
   logInput = options.logInput;
-};
+}
 
-exports.processSteamIds = function(steamContents, callback) {
+function processSteamIds(steamContents, callback) {
   if (!isValidInput(steamContents)) {
     callback([],[]);
     return;
@@ -40,7 +43,7 @@ exports.processSteamIds = function(steamContents, callback) {
   getInformationFromAPI(steamIDs, function(players, banData) {
     processData(players, banData, callback);
   });
-};
+}
 
 function isValidInput(input) {
   if (API === "") {
