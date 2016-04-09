@@ -97,7 +97,7 @@ function getFriends(player, players) {
 
   for (var i = 0; i < players.length; i++) {
     var otherPlayer = players[i];
-    if ((friendList.indexOf((""+otherPlayer.getCommunityid())) !== -1) && otherPlayer.getNick() !== nick) {
+    if ((friendList.indexOf((otherPlayer.getCommunityid())) !== -1) && otherPlayer.getNick() !== nick) {
       result.push(otherPlayer.getNick());
     }
   }
@@ -211,7 +211,7 @@ function sortFunction(a, b) {
 function communityIdToNick(players, communityId) {
   for (var i = 0; i < players.length; i++) {
     var player = players[i];
-    if ((""+player.getCommunityid()) === communityId) {
+    if ((player.getCommunityid()) === communityId) {
       return player.getNick();
     }
   }
@@ -286,10 +286,8 @@ function collectURLs(allPlayersInfo) {
     var playerInfo = allPlayersInfo[i].replace("  ", " ").replace("   ", " ");
 
     if (isValidPlayerInfo(playerInfo)) {
-      infoArray = splitInfoToArr(playerInfo);
-
-      var player = new Player(infoArray[3], infoArray[4], steamToCommunityId(infoArray[4]));
-
+      var nickAndSteamid = getNickAndSteamid(playerInfo);
+      var player = new Player(nickAndSteamid.nick, nickAndSteamid.steamid, steamToCommunityId(nickAndSteamid.steamid));
       players.push(player);
       nodesFriends.push('http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key='+API+'&steamid='+player.getCommunityid()+'&relationship=friend');
       nodesGameStats.push('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key='+API+'&steamid='+player.getCommunityid());
@@ -310,17 +308,20 @@ function isValidPlayerInfo(pInfo) {
       (isNum(pInfo.charAt(2)) || isNum(pInfo.charAt(3)));
 }
 
-function splitInfoToArr(info) {
-  var arr = [].concat.apply([], info.split('"').map(function(v,i){
-         return i%2 ? v : v.split(' ');
-      })).filter(Boolean);
-  return arr;
+function getNickAndSteamid(info) {
+  var nickAndSteam = info.split(/"(.*)" (STEAM.*?) /);
+  var player = {
+    nick : nickAndSteam[1],
+    steamid : nickAndSteam[2]
+  };
+  return player;
 }
 
 // Convert a 32-bit steamID to a 64-bit steamID, using the mathjs library
 function steamToCommunityId(steamId) {
   var parts = steamId.split(":");
-  return math.eval("("+parts[2]+"*2)+76561197960265728+"+parts[1]);
+  var result = math.eval("("+parts[2]+"*2)+76561197960265728+"+parts[1]);
+  return math.string(result);
 }
 
 // "Class" representing a player
